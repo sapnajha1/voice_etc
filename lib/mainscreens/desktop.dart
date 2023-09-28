@@ -1,0 +1,397 @@
+
+import 'dart:async';
+import 'dart:convert';
+import 'dart:math';
+
+
+import 'package:englishetc_voice_ai/api_function/api.dart';
+import 'package:englishetc_voice_ai/article_name.dart';
+import 'package:englishetc_voice_ai/components/Article.dart';
+import 'package:englishetc_voice_ai/components/Focus.dart';
+import 'package:englishetc_voice_ai/const/color.dart';
+import 'package:englishetc_voice_ai/constWidget/textwidget.dart';
+import 'package:englishetc_voice_ai/focus_screens/f_desktop.dart';
+import 'package:englishetc_voice_ai/ttsexample.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+import 'package:http/http.dart' as http;
+import 'package:speech_to_text/speech_to_text.dart' as stt;
+
+
+import 'aap_bar.dart';
+
+
+
+
+class DesktopPage extends StatefulWidget {
+   DesktopPage({super.key, required this.title, required this.userdata});
+
+
+  GoogleSignInAccount? userdata;
+  final String title;
+
+  @override
+  State<DesktopPage> createState() => _DesktopPageState();
+}
+
+class _DesktopPageState extends State<DesktopPage> {
+
+  // Color btn_col=Colors.white;
+
+  Color btn_col = Colors.white;
+  double textsize=20;
+  var Paragraph='';
+  int selected_index=1;
+  int article_name_in=0;
+  int selected_index2=1;
+  StreamController _uiChangeStreamController=StreamController();
+  final stt.SpeechToText _speech=stt.SpeechToText();
+
+  bool _isListening=false;
+  String _text="";
+  
+
+  @override
+   void initState(){
+    super.initState();
+    fetchData();
+    _initializeSpeech();
+   }
+
+  Future <void> _initializeSpeech()async{
+    await _speech.initialize(
+      onStatus : (status){
+      print("Speech recongnition status: $status");
+      });
+
+  }
+
+  Future<void> _startListening() async{
+
+  if (!_isListening) {
+      bool available = await _speech.initialize();
+      if (available) {
+        setState(() {
+          _isListening = true;
+        });
+        _speech.listen(
+          onResult: (result) {
+            setState(() {
+              _text = result.recognizedWords;
+              print(_text);
+            });
+          },
+        );
+      }
+    }
+  }
+
+  Future<void> _stopListening() async {
+    if (_isListening) {
+      setState(() {
+        _isListening = false;
+      });
+      await _speech.stop();
+    }
+  }
+
+
+
+  // SPEECH TO TEXT FUNCTION 
+
+
+  // TEXT TO SPEECH FUNCTION
+  FlutterTts flutterTts = FlutterTts();
+  Future<void> speakText(String Paragraph) async {
+    final ttsExample = TtsExample(); // Create an instance of the TtsExample class
+    await ttsExample.speakText(Paragraph); // Call the speakText function
+    
+
+    // Emit a UI change event to stop the AI
+    _uiChangeStreamController.sink.add(null);
+  }
+
+  Future<void> stopSpeaking() async {
+    await flutterTts.stop(); // Stop TTS
+  }
+  ///////////////////////////////////////////
+  
+
+
+  List<Article_Model> article_content=[];
+  Future<void> fetchData() async {
+  try {
+    final response = await http.get(Uri.parse('https://merd-api.merakilearn.org/englishAi/content'));
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body)['articles'] as List<dynamic>;
+
+      setState(() {
+        article_content = jsonData
+            .map((data) => Article_Model.fromJson(data as Map<String, dynamic>))
+            .toList();
+      });
+
+      print(article_content);
+      print("hello");
+    } else {
+      // Handle error if the API request fails.
+      print('API request failed with status code: ${response.statusCode}');
+    }
+    } catch (e) {
+    print('Error fetching data: $e');
+    }
+  }
+
+
+
+  
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    var mq= MediaQuery.of(context).size;
+    if (article_content.isEmpty){
+
+      return const Center(child: 
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text("Loading the data",
+          style: TextStyle(fontSize:15,color:Colors.black),),
+          SizedBox(height: 10,),
+          CircularProgressIndicator(
+            strokeWidth:0.7,
+          )
+        ],
+      ));
+    }
+    return Scaffold(
+      // appbar
+      appBar: appbar(
+        Paragraph: Paragraph,
+        userData: widget.userdata,
+        appbaricon: Icons.person,
+        appbarsize: 16,image_height: 20,image_width: 40,textfont: 18,popupmenu: 15,
+      ),
+
+      backgroundColor: Colors.white,
+
+      body:Column(
+        children: [
+          Expanded(
+            child:
+            SingleChildScrollView(
+              physics: ScrollPhysics(),
+              child: Padding(
+                padding:  EdgeInsets.all(25.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+
+                        // Article image
+                        Article_image(height:mq.height*0.15,width:mq.width*0.15,),
+
+                        // Article name
+                        const SizedBox(width:0),
+
+                        
+                        Flexible(child: textwidget(article_content[article_name_in].title,25, FontWeight.bold, textcolor)),
+
+                        // Article in Focus mode
+                        const SizedBox(width:0),
+                        InkWell(onTap:(){Navigator.push(context, MaterialPageRoute(builder: ((context) => f_DesktopPage(article_name_in: article_name_in, selected_index: selected_index, article_content: article_content, selected_index2: selected_index2, textsize: textsize))));},
+                        child:Focas_container(focustext:"Enter to focus Mode",fontsize:17,))
+                        //  height:mq.height* 0.090,width:mq.width* 0.17
+                      ],),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Level_con(m_height:70, m_width:840, level_text_size:20, space_l_b:20),
+                        Container(
+                          //  color: Colors.red,
+                            width:mq.width*0.450,
+                            height:mq.height*0.090,
+                            // LEVEL TEXT
+                            child:Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children:[
+                                    textwidget("Level",25, FontWeight.bold, menu),
+                                    SizedBox(width:20),
+
+                                    //DIFFERENT LEVEL ACCORDING TO THE NUMBERS'S  CONTAINER
+                                  
+
+                                     Container(
+                                        child:Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children:[
+                                            FloatingActionButton(elevation:0.0,shape:CircleBorder( ),backgroundColor:
+                                            selected_index==1?Colors.lightGreen:Colors.white,
+                                                onPressed:(){setState(() {selected_index=1;});},child: textwidget("1", 20, FontWeight.w300, textcolor)),
+                                            FloatingActionButton(elevation:0.0,shape:CircleBorder( ),backgroundColor:
+                                            selected_index==2?Colors.lightGreen:Colors.white,
+                                                onPressed:(){setState(() {selected_index=2;});},child: textwidget("2", 20, FontWeight.w300, textcolor)),
+                                            FloatingActionButton(elevation:0.0,shape:CircleBorder( ),backgroundColor:
+                                            selected_index==3?Colors.lightGreen:Colors.white,
+                                                onPressed:(){setState(() {selected_index=3;});},child: textwidget("3", 20, FontWeight.w300, textcolor)),
+                                            FloatingActionButton(elevation:0.0,shape:CircleBorder( ),backgroundColor:
+                                            selected_index==4?Colors.lightGreen:Colors.white,
+                                                onPressed:(){setState(() {selected_index=4;});},child: textwidget("4", 20, FontWeight.w300, textcolor)),
+                                            FloatingActionButton(elevation:0.0,shape:CircleBorder( ),backgroundColor:
+                                            selected_index==5?Colors.lightGreen:Colors.white,
+                                                onPressed:(){setState(() {selected_index=5;});},child: textwidget("5", 20, FontWeight.w300, textcolor)),
+                                          ],),
+                                      ),
+                                    
+                                    
+                                  ]),
+                            )),
+
+
+                        // Article font size
+
+                        SizedBox(width:250),
+                        Expanded(
+                            child: Container(height:30,
+                              child:Row(mainAxisAlignment: MainAxisAlignment.start,
+
+                                children:[
+                                  FloatingActionButton(elevation: 0.0,shape:CircleBorder( ),backgroundColor:
+                                  selected_index2==1?Color.fromARGB(255, 113, 168, 47):Colors.white,
+                                      onPressed:(){setState(() {selected_index2=1;textsize=22;});},
+                                      child: textwidget("A",15, FontWeight.w500, Colors.black)),
+                                  FloatingActionButton(elevation: 0.0,shape:CircleBorder( ),backgroundColor:
+                                  selected_index2==2?Color.fromARGB(255, 113, 168, 47):Colors.white,
+                                      onPressed:(){setState(() {selected_index2=2;textsize=24;});},
+                                      child: textwidget("A", 20, FontWeight.w500, Colors.black)),
+                                  FloatingActionButton(elevation: 0.0,shape:CircleBorder( ),backgroundColor:
+                                  selected_index2==3?Color.fromARGB(255, 113, 168, 47):Colors.white,
+                                      onPressed:(){setState(() {selected_index2=3;textsize=26;});},
+                                      child: textwidget("A",23, FontWeight.w500, Colors.black)),
+
+                                ],),
+                            ),
+                          ),
+
+
+                      ],),
+                    SizedBox(height:20),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        ElevatedButton(style: 
+                          ElevatedButton.styleFrom(
+                            backgroundColor:menu,
+                            shape: RoundedRectangleBorder() ),
+                          onPressed:(){if (Paragraph != null) {speakText(Paragraph!);}} ,
+                          child:Text("Start AI",style:TextStyle(color:Colors.white),)
+                        ),
+
+                        SizedBox(width:20),
+
+                        ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor:menu,shape: RoundedRectangleBorder() ),onPressed:(){stopSpeaking();} , child:Text("Stop AI",style:TextStyle(color:Colors.white),)),
+                        SizedBox(width:20),
+                        ElevatedButton(onPressed: _startListening, child:  Icon(Icons.mic)),
+                        SizedBox(width:20),
+                        ElevatedButton(onPressed: _stopListening, child:  Icon(Icons.stop))
+
+                    
+                      ],
+                    ),
+                    
+                    SizedBox(height:30),
+                    // Article content
+
+                    // Wrap the part that displays the article content with StreamBuilder
+                      StreamBuilder(
+                        stream: _uiChangeStreamController.stream,
+                        builder: (context, snapshot) {
+                          // Check if an event is received
+                          if (snapshot.hasData) {
+                            // Stop the AI when an event is received
+                            stopSpeaking();
+                          }
+
+                          // Return the UI for displaying the article content
+                          return Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Container(
+                              child: (() {
+                                if (selected_index == 1) {
+                                  Paragraph = article_content[article_name_in].level1;
+                                  print(Paragraph);
+                                  return textwidget(article_content[article_name_in].level1, textsize, FontWeight.w200, Colors.black);
+                                } else if (selected_index == 2) {
+                                  Paragraph = article_content[article_name_in].level2;
+                                  print(Paragraph);
+                                  return textwidget(article_content[article_name_in].level2, textsize, FontWeight.w200, Colors.black);
+                                } else if (selected_index == 3) {
+                                  Paragraph = article_content[article_name_in].level3;
+                                  print(Paragraph);
+                                  return textwidget(article_content[article_name_in].level3, textsize, FontWeight.w200, Colors.black);
+                                } else if (selected_index == 4) {
+                                  Paragraph = article_content[article_name_in].level4;
+                                  print(Paragraph);
+                                  return textwidget(article_content[article_name_in].level4, textsize, FontWeight.w200, Colors.black);
+                                } else {
+                                  Paragraph = article_content[article_name_in].level5;
+                                  print(Paragraph);
+                                  return textwidget(article_content[article_name_in].level5, textsize, FontWeight.w200, Colors.black);
+                                }
+                              })(),
+                            ),
+                          );
+                        },
+                      ),
+
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          Container(height: 60,width:mq.width
+              ,child:Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children:[
+                    InkWell(onTap: (){setState((){if(article_name_in>0){article_name_in--;}});}, child: Image.asset("images/left-arrow.png",height:35,width:35)),
+                    InkWell(onTap: (){setState((){if(article_name_in<article_content.length-1){article_name_in++;}});},child: Image.asset("images/right-arrow-black-triangle.png",height:35,width:35)),
+                    InkWell(onTap:(){Navigator.push(context, MaterialPageRoute(builder: (context)=>article_names(article_content: article_content)));},child:Text("Content",style: TextStyle(fontSize:20,fontWeight: FontWeight.bold),))
+                  ])),
+        
+
+         
+        ],
+      ),
+    );
+  }
+  @override
+  void dispose() {
+    _speech.stop();
+    super.dispose();
+     _uiChangeStreamController.close(); // Close the stream when the widget is disposed
+    super.dispose();
+  }
+  
+  
+  
+  
+}
+
+
+
+
+
+
