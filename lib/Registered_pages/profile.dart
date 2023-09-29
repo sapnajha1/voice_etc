@@ -28,7 +28,7 @@ class _profileState extends State<profile> {
           Paragraph: null,
           userData: widget.userData,
           appbaricon: Icons.person,
-          appbarsize: 16,image_height: 20,image_width: 30,textfont: 18,popupmenu:15,
+          appbarsize: 16,image_height: 20,image_width: 30,textfont: 18,popupmenu:15, cleanedWord: null, notAvailable: '', score: null,
         ),
         body:
         Center(

@@ -1,12 +1,14 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:js_util';
 import 'package:englishetc_voice_ai/api_function/model.dart';
 import 'package:englishetc_voice_ai/components/Article.dart';
 import 'package:englishetc_voice_ai/components/Focus.dart';
 import 'package:englishetc_voice_ai/const/color.dart';
 import 'package:englishetc_voice_ai/constWidget/textwidget.dart';
 import 'package:englishetc_voice_ai/focus_screens/f_desktop.dart';
+import 'package:englishetc_voice_ai/mainscreens/progress.dart';
 import 'package:englishetc_voice_ai/ttsexample.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -48,6 +50,8 @@ class _DesktopPageState extends State<DesktopPage> {
   String userVoiceData='';
   Map<String,dynamic> userPostData={};
   List<String> heyspeak=[];
+  List<String> notAvailable = [];
+  List<String> Available = [];
   
 
   bool _isListening=false;
@@ -87,9 +91,10 @@ Future<void> _startListening() async {
         onResult: (result) {
           setState(() {
             _text = result.recognizedWords.toLowerCase();
-            
-            heyspeak.add(_text);
-            print("$heyspeak yes");
+
+            heyspeak = _text.split(' ');
+            // print("$heyspeak yes");
+
             if (_text.contains("level 1")) {
               setState(() {
                 selected_index = 1;
@@ -146,11 +151,17 @@ Future<void> _startListening() async {
             // }
 
           });
+
         },
+
       );
     }
+
   }
 }
+
+   // Set<String> voiceset= Set<String>();
+   // voiceset.addAll(heyspeak);
 
   Future<void> _stopListening() async {
     if (_isListening) {
@@ -215,13 +226,6 @@ Future<void> pronounceWord(String word) async {
 
 
   /////////////////////////////////////////////////////////////////////////////
-
-  
-
-  
-
-
-  
 List<Article_Model> article_content=[];
 Future<void> fetchData() async {
   try {
@@ -247,19 +251,19 @@ Future<void> fetchData() async {
   }
 }
 
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////
+//   Future<void> Comparison(){
+//
+//   }
 
-  
 
 
-
+////////////////////////////////////////////////////////////////////////////////////
   @override
   Widget build(BuildContext context) {
     // Paragraph= article_content[article_name_in].level2;
     
-    // print(words);
+
     var mq= MediaQuery.of(context).size;
     
 
@@ -284,14 +288,14 @@ Future<void> fetchData() async {
         Paragraph: Paragraph,
         userData: widget.userdata,
         appbaricon: Icons.person,
-        appbarsize: 16,image_height: 20,image_width: 40,textfont: 18,popupmenu: 15,
+        appbarsize: 16,image_height: 20,image_width: 40,textfont: 18,popupmenu: 15, cleanedWord: null, notAvailable: '', score: null,
       ),
 
       backgroundColor: Colors.white,
 
       body:Column(
         children: <Widget>[
-          
+
           Expanded(
             child:
             SingleChildScrollView(
@@ -318,7 +322,9 @@ Future<void> fetchData() async {
 
                         // Article in Focus mode
                         const SizedBox(width:0),
-                        InkWell(onTap:(){Navigator.push(context, MaterialPageRoute(builder: ((context) => f_DesktopPage(article_name_in: article_name_in, selected_index: selected_index, article_content: article_content, selected_index2: selected_index2, textsize: textsize))));},
+                        InkWell(onTap:(){
+                          // Navigator.push(context, MaterialPageRoute(builder: ((context) => f_DesktopPage(article_name_in: article_name_in, selected_index: selected_index, article_content: article_content, selected_index2: selected_index2, textsize: textsize))));
+                          },
                         child:Focas_container(focustext:"Enter to focus Mode",fontsize:17,))
                         //  height:mq.height* 0.090,width:mq.width* 0.17
                       ],),
@@ -326,6 +332,7 @@ Future<void> fetchData() async {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+
                         // Level_con(m_height:70, m_width:840, level_text_size:20, space_l_b:20),
                         Container(
                           //  color: Colors.red,
@@ -341,7 +348,7 @@ Future<void> fetchData() async {
                                     SizedBox(width:20),
 
                                     //DIFFERENT LEVEL ACCORDING TO THE NUMBERS'S  CONTAINER
-                                  
+
 
                                      Container(
                                         child:Row(
@@ -364,7 +371,7 @@ Future<void> fetchData() async {
                                                 onPressed:(){setState(() {selected_index=5;});},child: textwidget("5", 20, FontWeight.w300, textcolor)),
                                           ],),
                                       ),
-                                    
+
                                     
                                   ]),
                             )),
@@ -418,15 +425,26 @@ Future<void> fetchData() async {
                       SizedBox(width:15),
                       ElevatedButton(onPressed: (){
                         _stopListening();
-                        print("$heyspeak hello");
-                        // List<String> listuserVoiceData = userVoiceData.trim().split(" ");
-                       
-                        // print(listuserVoiceData);
-                        // postData(UserData(usersReading: userVoiceData, level: selected_index, englishAiContentId:article_name_in,));
-                        // print("calling the post function");
+                        int score = 0;// Iterate through heyspeak and perform the checks
+                        final cleanedWord = Paragraph.replaceAll(RegExp(r'[^\w\s]'), '').trim().split(" ");
+                        for (String word in heyspeak) {
+                          if (Paragraph.contains(word)) {
+                            Available.add(word);
+                            score++; // Increment the score if the word is found in the paragraph
+                          } else {
+                            notAvailable.add(word); // Add the word to notAvailable if it's not found
+                          }
+                        }// Print the results
+                        print("Words not available in paragraph: $notAvailable");
+                        // print("Words available in paragraph: $Available");
+                        int ParagraphLength= cleanedWord.length;
+                        print("Your Score: $score/ $ParagraphLength");
+                        // print(Paragraph.length);
+                        showAlertDialog(context,score, notAvailable,ParagraphLength );
                         }, 
                         
-                        child:textwidget("finish", 10, FontWeight.bold, Color.fromARGB(255, 25, 104, 82))),
+                        child:textwidget("finish", 10, FontWeight.bold, Color.fromARGB(255, 25, 104, 82))
+                        ),
                       
                     ],
                   ),

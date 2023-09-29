@@ -1,4 +1,8 @@
 
+import 'package:englishetc_voice_ai/mainscreens/desktop.dart';
+import 'package:englishetc_voice_ai/mainscreens/mobile.dart';
+import 'package:englishetc_voice_ai/mainscreens/tablet.dart';
+import 'package:englishetc_voice_ai/responsive/responsive_layout.dart';
 import 'package:englishetc_voice_ai/splash.dart';
 import 'package:englishetc_voice_ai/voice_re.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +34,7 @@ class MyApp extends StatelessWidget {
       ),
 
       // home:ErrorPronunciation()
-      home:splashScreen()
+       home:splashScreen()
       // home: Responsive_layout(
       //           mobileScaffold: MobilePage(title: 'mobilepage',userdata:googleSignInAccount),
       //           tabletScaffold: tabletPage(title: 'tabletpage',userdata:googleSignInAccount),

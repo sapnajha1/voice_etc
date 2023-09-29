@@ -31,9 +31,12 @@ class appbar extends StatelessWidget implements PreferredSizeWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   double popupmenu;
+  int? score;
+  String? notAvailable;
+  int? cleanedWord;
 
 
-  appbar({required this.Paragraph,required this.appbaricon,required this.userData, required this.appbarsize ,required this.popupmenu,required this.image_width,required this.image_height,required this.textfont, });
+  appbar({required this.cleanedWord,required this.notAvailable,required this.score,required this.Paragraph,required this.appbaricon,required this.userData, required this.appbarsize ,required this.popupmenu,required this.image_width,required this.image_height,required this.textfont, });
   
   // FlutterTts flutterTts = FlutterTts();
   // Future<void> speakText(String Paragraph) async {
@@ -135,9 +138,10 @@ class appbar extends StatelessWidget implements PreferredSizeWidget {
                                       Navigator.push(context, MaterialPageRoute(builder: (context)=>profile(userData: userData)));
 
                                     }
-                                    // else if (value == 'progress') {
-
-                                    // } else if (value == 'edit') {
+                                    else if (value == 'progress') {
+                                      showAboutDialog(context: context,);
+                                     } 
+                                    //else if (value == 'edit') {
                                     //     _scaffoldKey.currentState?.openDrawer();
 
                                     // }

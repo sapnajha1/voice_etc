@@ -222,7 +222,7 @@ Future<void> _startListening() async {
         Paragraph: Paragraph,
         userData: widget.userdata,
         appbaricon: Icons.person,
-        appbarsize: 16,image_height: 20,image_width: 40,textfont: 18,popupmenu: 15,
+        appbarsize: 16,image_height: 20,image_width: 40,textfont: 18,popupmenu: 15, cleanedWord: null, notAvailable: '', score: null,
       ),
       backgroundColor: Colors.white,
       body: Column(

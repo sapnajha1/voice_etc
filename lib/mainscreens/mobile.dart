@@ -216,7 +216,7 @@ Future<void> fetchData() async {
           Paragraph: Paragraph,
           userData: widget.userdata,
           appbaricon: Icons.person,
-          appbarsize: 16,image_height: 20,image_width: 30,textfont: 18,popupmenu:15,
+          appbarsize: 16,image_height: 20,image_width: 30,textfont: 18,popupmenu:15, cleanedWord: null, notAvailable: '', score: null,
         ),
         backgroundColor: Colors.white,
         //BODY

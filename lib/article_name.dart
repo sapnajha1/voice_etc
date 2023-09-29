@@ -45,7 +45,7 @@ class _article_namesState extends State<article_names> {
         Paragraph: null,
         userData: widget.userData,
         appbaricon: Icons.person,
-        appbarsize: 16,image_height: 20,image_width: 40,textfont: 18,popupmenu: 15,
+        appbarsize: 16,image_height: 20,image_width: 40,textfont: 18,popupmenu: 15, cleanedWord: null, notAvailable: '', score: null,
       ),
 
       body:Column(

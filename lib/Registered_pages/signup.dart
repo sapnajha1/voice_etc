@@ -55,51 +55,6 @@ class _SignUpState extends State<SignUp> {
 
   }
 
-  // final _googleSignIn = GoogleSignIn();
-  // Future<void> GoogleSignOut() async {
-  // try {
-  //   await _googleSignIn.signOut();
-  //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Successfully Logout'),),);
-  //   } catch (error) {
-  //   print("Error signing out: $error");
-  //   }
-  // }
-  // String userEmail="";
-  // String userName="";
-  // static const String emailKey="Email";
-  // static const String nameKey= "Name";
-  //
-  // void setuserData() async{
-  //   SharedPreferences sharePref= await SharedPreferences.getInstance();
-  //   sharePref.setString(emailKey,googleSignInAccount.email);
-  //   sharePref.setString(nameKey, googleSignInAccount.displayName);
-  //   sharePref.setBool('login_data',true);
-  //   getuserData();
-  // }
-  //
-  // void getuserData() async{
-  //   SharedPreferences sharePref= await SharedPreferences.getInstance();
-  //   userEmail=sharePref.getString(emailKey)??"no data ";
-  //   userName=sharePref.getString(nameKey)??"no data";
-  //   splashScreen.login_data=sharePref.getBool('login_data')?? false;
-  //   print("now get bool value is ${splashScreen.login_data}");
-  // }
-
-  // GlobalKey  _formkey = GlobalKey();
-  // TextEditingController email_ctrl= TextEditingController();
-  // TextEditingController pswd_ctrl= TextEditingController();
-  // String message="";
-
-  // String? emailValidation(value ){
-  //   if (value.isEmpty){return message="Email is required";}
-  //   if (!emailRegEx.hasMatch(value)){return message="Invalid EmaiId";}
-
-  // }
-
-  // String? pswdValidation(value ){
-  //   if (value.isEmpty){return message="password is required";}
-  //   if (!pswdRegEx.hasMatch(value)){return message="Invalid Password";}
-
   // }
   @override
   Widget build(BuildContext context) {
