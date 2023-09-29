@@ -1,17 +1,14 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
-
-
-import 'package:englishetc_voice_ai/api_function/api.dart';
-import 'package:englishetc_voice_ai/article_name.dart';
+import 'package:englishetc_voice_ai/api_function/model.dart';
 import 'package:englishetc_voice_ai/components/Article.dart';
 import 'package:englishetc_voice_ai/components/Focus.dart';
 import 'package:englishetc_voice_ai/const/color.dart';
 import 'package:englishetc_voice_ai/constWidget/textwidget.dart';
 import 'package:englishetc_voice_ai/focus_screens/f_desktop.dart';
 import 'package:englishetc_voice_ai/ttsexample.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -42,12 +39,16 @@ class _DesktopPageState extends State<DesktopPage> {
 
   Color btn_col = Colors.white;
   double textsize=20;
-  var Paragraph='';
+  var Paragraph;
   int selected_index=1;
-  int article_name_in=0;
+  int article_name_in=2;
   int selected_index2=1;
   StreamController _uiChangeStreamController=StreamController();
   final stt.SpeechToText _speech=stt.SpeechToText();
+  String userVoiceData='';
+  Map<String,dynamic> userPostData={};
+  List<String> heyspeak=[];
+  
 
   bool _isListening=false;
   String _text="";
@@ -60,6 +61,10 @@ class _DesktopPageState extends State<DesktopPage> {
     _initializeSpeech();
    }
 
+
+  /////////////////////////////////////////
+  //// SPEECH TO TEXT FUNCTION 
+
   Future <void> _initializeSpeech()async{
     await _speech.initialize(
       onStatus : (status){
@@ -68,29 +73,89 @@ class _DesktopPageState extends State<DesktopPage> {
 
   }
 
-  Future<void> _startListening() async{
-
+  List availablecontent=["article 1","article 2","article 3","article 4","level 1","level 2","level 3","level 4","level 5"];
+Future<void> _startListening() async {
   if (!_isListening) {
-      bool available = await _speech.initialize();
-      if (available) {
-        setState(() {
-          _isListening = true;
-        });
-        _speech.listen(
-          onResult: (result) {
-            setState(() {
-              _text = result.recognizedWords;
-              print(_text);
-            });
-          },
-        );
-      }
+    
+    bool available = await _speech.initialize();
+
+    if (available) {
+      setState(() {
+        _isListening = true;
+      });
+      _speech.listen(
+        onResult: (result) {
+          setState(() {
+            _text = result.recognizedWords.toLowerCase();
+            
+            heyspeak.add(_text);
+            print("$heyspeak yes");
+            if (_text.contains("level 1")) {
+              setState(() {
+                selected_index = 1;
+              });
+            } else if (_text.contains("level 2")) {
+              setState(() {
+                selected_index = 2;
+              });
+            } else if (_text.contains("level 3")) {
+              setState(() {
+                selected_index = 3;
+              });
+            } else if (_text.contains("level 4")) {
+              setState(() {
+                selected_index = 4;
+              });
+            } else if (_text.contains("level 5")) {
+              setState(() {
+                selected_index = 5;
+              });
+            }
+
+
+            // Check recognized voice command and change the topic
+
+            else if (_text.contains("article 1")){
+              setState(() {
+                article_name_in=0;
+              });
+            } else if (_text.contains("article 2")){
+              setState(() {
+                article_name_in= 1;
+              });
+
+
+            }else if (_text.contains("article 3")){
+              setState(() {
+                article_name_in=2;
+              });
+
+
+            }else if (_text.contains("article 4")) {
+              setState(() {
+                article_name_in = 3;
+              });
+            }
+            // }else if (!availablecontent.contains(_text)){
+            //   ScaffoldMessenger.of(context).showSnackBar(
+            //     SnackBar(
+            //       content: Text('invalid content'),
+            //
+            //     ),
+            //   );
+            // }
+
+          });
+        },
+      );
     }
   }
+}
 
   Future<void> _stopListening() async {
     if (_isListening) {
       setState(() {
+        // heyspeak.add(_text);
         _isListening = false;
       });
       await _speech.stop();
@@ -99,7 +164,7 @@ class _DesktopPageState extends State<DesktopPage> {
 
 
 
-  // SPEECH TO TEXT FUNCTION 
+  ///////////////////////////////////////////////////////////////////////////////
 
 
   // TEXT TO SPEECH FUNCTION
@@ -116,12 +181,49 @@ class _DesktopPageState extends State<DesktopPage> {
   Future<void> stopSpeaking() async {
     await flutterTts.stop(); // Stop TTS
   }
-  ///////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  ///PONOUNCTICIATE  WORDS FUNCTION
+  
+
+  
+  TextSpan buildTextSpan(List<String> words) {
+  List<InlineSpan> spans = [];
+  for (String word in words) {
+    spans.add(
+      TextSpan(
+        text: word + ' ', // Include a space to separate words
+        style: TextStyle(
+          // decoration: TextDecoration.underline,
+          color: Colors.black,
+          fontSize:textsize,
+        ),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () {
+            pronounceWord(word);
+          },
+      ),
+    );
+  }
+  // return TextSpan();
+  return TextSpan(children: spans);
+}
+
+Future<void> pronounceWord(String word) async {
+    await flutterTts.speak(word);}
+
+
+
+  /////////////////////////////////////////////////////////////////////////////
+
+  
+
   
 
 
-  List<Article_Model> article_content=[];
-  Future<void> fetchData() async {
+  
+List<Article_Model> article_content=[];
+Future<void> fetchData() async {
   try {
     final response = await http.get(Uri.parse('https://merd-api.merakilearn.org/englishAi/content'));
 
@@ -133,19 +235,21 @@ class _DesktopPageState extends State<DesktopPage> {
             .map((data) => Article_Model.fromJson(data as Map<String, dynamic>))
             .toList();
       });
-
-      print(article_content);
-      print("hello");
+     
+     
+     
     } else {
       // Handle error if the API request fails.
       print('API request failed with status code: ${response.statusCode}');
     }
-    } catch (e) {
+  } catch (e) {
     print('Error fetching data: $e');
-    }
   }
+}
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////
 
   
 
@@ -153,7 +257,12 @@ class _DesktopPageState extends State<DesktopPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Paragraph= article_content[article_name_in].level2;
+    
+    // print(words);
     var mq= MediaQuery.of(context).size;
+    
+
     if (article_content.isEmpty){
 
       return const Center(child: 
@@ -181,7 +290,8 @@ class _DesktopPageState extends State<DesktopPage> {
       backgroundColor: Colors.white,
 
       body:Column(
-        children: [
+        children: <Widget>[
+          
           Expanded(
             child:
             SingleChildScrollView(
@@ -191,6 +301,7 @@ class _DesktopPageState extends State<DesktopPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
+                    
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -289,72 +400,99 @@ class _DesktopPageState extends State<DesktopPage> {
                     SizedBox(height:20),
 
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        ElevatedButton(style: 
-                          ElevatedButton.styleFrom(
-                            backgroundColor:menu,
-                            shape: RoundedRectangleBorder() ),
-                          onPressed:(){if (Paragraph != null) {speakText(Paragraph!);}} ,
-                          child:Text("Start AI",style:TextStyle(color:Colors.white),)
-                        ),
-
-                        SizedBox(width:20),
-
-                        ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor:menu,shape: RoundedRectangleBorder() ),onPressed:(){stopSpeaking();} , child:Text("Stop AI",style:TextStyle(color:Colors.white),)),
-                        SizedBox(width:20),
-                        ElevatedButton(onPressed: _startListening, child:  Icon(Icons.mic)),
-                        SizedBox(width:20),
-                        ElevatedButton(onPressed: _stopListening, child:  Icon(Icons.stop))
-
-                    
-                      ],
-                    ),
+                    children: [
+                      ElevatedButton(onPressed:(){if (Paragraph != null) {speakText(Paragraph!);}}, child:Icon(Icons.speaker)),
+                      SizedBox(width:15),
+                      ElevatedButton(onPressed: (){stopSpeaking();}, child:Icon(Icons.speaker_notes_off)),
+                      SizedBox(width:15),
+                      ElevatedButton(onPressed: (){_startListening();}, child:Icon(Icons.mic)),
+                      SizedBox(width:15),
+                      ElevatedButton(onPressed: (){_stopListening();}, child:Icon(Icons.stop)),
+                      SizedBox(width:15),
+                      ElevatedButton(onPressed: (){_startListening();
+                      userVoiceData =_text;
+                      // heyspeak.add(userVoiceData);
+                      
+                       print("this is the user voice $userVoiceData yes");
+                      }, child:textwidget("start", 10, FontWeight.bold, Color.fromARGB(255, 25, 104, 82))),
+                      SizedBox(width:15),
+                      ElevatedButton(onPressed: (){
+                        _stopListening();
+                        print("$heyspeak hello");
+                        // List<String> listuserVoiceData = userVoiceData.trim().split(" ");
+                       
+                        // print(listuserVoiceData);
+                        // postData(UserData(usersReading: userVoiceData, level: selected_index, englishAiContentId:article_name_in,));
+                        // print("calling the post function");
+                        }, 
+                        
+                        child:textwidget("finish", 10, FontWeight.bold, Color.fromARGB(255, 25, 104, 82))),
+                      
+                    ],
+                  ),
                     
                     SizedBox(height:30),
                     // Article content
 
                     // Wrap the part that displays the article content with StreamBuilder
-                      StreamBuilder(
-                        stream: _uiChangeStreamController.stream,
-                        builder: (context, snapshot) {
-                          // Check if an event is received
-                          if (snapshot.hasData) {
-                            // Stop the AI when an event is received
-                            stopSpeaking();
-                          }
+                      // StreamBuilder(
+                      //   stream: _uiChangeStreamController.stream,
+                      //   builder: (context, snapshot) {
+                      //     // Check if an event is received
+                      //     if (snapshot.hasData) {
+                      //       // Stop the AI when an event is received
+                      //       stopSpeaking();
+                      //     }
 
                           // Return the UI for displaying the article content
-                          return Padding(
+                          // return 
+                          Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: Container(
                               child: (() {
                                 if (selected_index == 1) {
-                                  Paragraph = article_content[article_name_in].level1;
-                                  print(Paragraph);
-                                  return textwidget(article_content[article_name_in].level1, textsize, FontWeight.w200, Colors.black);
+                                
+                                    Paragraph = article_content[article_name_in].level1;
+                                    List<String> words = Paragraph.split(' ');
+                                    
+                                  return RichText(text:buildTextSpan(words));
+                                  
+                                  
+                                  // return textwidget(article_content[article_name_in].level1, textsize, FontWeight.w200, Colors.black);
                                 } else if (selected_index == 2) {
-                                  Paragraph = article_content[article_name_in].level2;
-                                  print(Paragraph);
-                                  return textwidget(article_content[article_name_in].level2, textsize, FontWeight.w200, Colors.black);
+                                   
+                                    Paragraph = article_content[article_name_in].level2;
+                                    List<String> words = Paragraph.split(' ');
+                                   return RichText(text:buildTextSpan(words));
+                                  
+                                  // return textwidget(article_content[article_name_in].level2, textsize, FontWeight.w200, Colors.black);
                                 } else if (selected_index == 3) {
-                                  Paragraph = article_content[article_name_in].level3;
-                                  print(Paragraph);
-                                  return textwidget(article_content[article_name_in].level3, textsize, FontWeight.w200, Colors.black);
+                                   
+                                    Paragraph = article_content[article_name_in].level3;
+                                    List<String> words = Paragraph.split(' ');
+                                    return RichText(text:buildTextSpan(words));
+                                  
+                                  // return textwidget(article_content[article_name_in].level3, textsize, FontWeight.w200, Colors.black);
                                 } else if (selected_index == 4) {
-                                  Paragraph = article_content[article_name_in].level4;
-                                  print(Paragraph);
-                                  return textwidget(article_content[article_name_in].level4, textsize, FontWeight.w200, Colors.black);
+                                   
+                                    Paragraph = article_content[article_name_in].level4;
+                                    List<String> words = Paragraph.split(' ');
+                                    return RichText(text:buildTextSpan(words));
+                                  // return textwidget(article_content[article_name_in].level4, textsize, FontWeight.w200, Colors.black);
                                 } else {
-                                  Paragraph = article_content[article_name_in].level5;
-                                  print(Paragraph);
-                                  return textwidget(article_content[article_name_in].level5, textsize, FontWeight.w200, Colors.black);
+                                   
+                                    Paragraph = article_content[article_name_in].level5;
+                                    List<String> words = Paragraph.split(' ');
+                                  return RichText(text:buildTextSpan(words));
+                                  // return textwidget(article_content[article_name_in].level5, textsize, FontWeight.w200, Colors.black);
                                 }
                               })(),
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                      //   },
+                      // ),
+
+
 
                   ],
                 ),
@@ -368,7 +506,7 @@ class _DesktopPageState extends State<DesktopPage> {
                   children:[
                     InkWell(onTap: (){setState((){if(article_name_in>0){article_name_in--;}});}, child: Image.asset("images/left-arrow.png",height:35,width:35)),
                     InkWell(onTap: (){setState((){if(article_name_in<article_content.length-1){article_name_in++;}});},child: Image.asset("images/right-arrow-black-triangle.png",height:35,width:35)),
-                    InkWell(onTap:(){Navigator.push(context, MaterialPageRoute(builder: (context)=>article_names(article_content: article_content)));},child:Text("Content",style: TextStyle(fontSize:20,fontWeight: FontWeight.bold),))
+                    // InkWell(onTap:(){Navigator.push(context, MaterialPageRoute(builder: (context)=>article_names(article_content: article_content)));},child:Text("Content",style: TextStyle(fontSize:20,fontWeight: FontWeight.bold),))
                   ])),
         
 
@@ -377,6 +515,9 @@ class _DesktopPageState extends State<DesktopPage> {
       ),
     );
   }
+  
+ 
+
   @override
   void dispose() {
     _speech.stop();

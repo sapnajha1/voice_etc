@@ -2,11 +2,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
-import 'package:englishetc_voice_ai/api_function/api.dart';
+import 'package:englishetc_voice_ai/api_function/model.dart';
 import 'package:englishetc_voice_ai/ttsexample.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../components/Article.dart';
 import '../components/Focus.dart';
 import '../const/color.dart';
@@ -37,6 +38,115 @@ class _MobilePageState extends State<MobilePage> {
   int article_name_in=0;
   var Paragraph='';
   StreamController _uiChangeStreamController=StreamController();
+  final stt.SpeechToText _speech=stt.SpeechToText();
+
+  bool _isListening=false;
+  String _text="";
+  
+
+  @override
+   void initState(){
+    super.initState();
+    fetchData();
+    _initializeSpeech();
+   }
+
+  Future <void> _initializeSpeech()async{
+    await _speech.initialize(
+      onStatus : (status){
+      print("Speech recongnition status: $status");
+      });
+
+  }
+
+  List availablecontent=["article 1","article 2","article 3","article 4","level 1","level 2","level 3","level 4","level 5"];
+Future<void> _startListening() async {
+  if (!_isListening) {
+    // bool available = await _speech.initialize();
+    bool available = await _speech.initialize();
+
+    if (available) {
+      setState(() {
+        _isListening = true;
+      });
+      _speech.listen(
+        onResult: (result) {
+          setState(() {
+            _text = result.recognizedWords.toLowerCase(); // Convert to lowercase for case-insensitive matching
+            print(_text);
+
+            // Check recognized voice command and change the level
+
+            if (_text.contains("level 1")) {
+              setState(() {
+                selected_index = 1;
+              });
+            } else if (_text.contains("level 2")) {
+              setState(() {
+                selected_index = 2;
+              });
+            } else if (_text.contains("level 3")) {
+              setState(() {
+                selected_index = 3;
+              });
+            } else if (_text.contains("level 4")) {
+              setState(() {
+                selected_index = 4;
+              });
+            } else if (_text.contains("level 5")) {
+              setState(() {
+                selected_index = 5;
+              });
+            }
+
+
+            // Check recognized voice command and change the topic
+
+            else if (_text.contains("article 1")){
+              setState(() {
+                article_name_in=0;
+              });
+            } else if (_text.contains("article 2")){
+              setState(() {
+                article_name_in= 1;
+              });
+
+
+            }else if (_text.contains("article 3")){
+              setState(() {
+                article_name_in=2;
+              });
+
+
+            }else if (_text.contains("article 4")) {
+              setState(() {
+                article_name_in = 3;
+              });
+            }
+            // }else if (!availablecontent.contains(_text)){
+            //   ScaffoldMessenger.of(context).showSnackBar(
+            //     SnackBar(
+            //       content: Text('invalid content'),
+            //
+            //     ),
+            //   );
+            // }
+
+          });
+        },
+      );
+    }
+  }
+}
+
+Future<void> _stopListening() async {
+    if (_isListening) {
+      setState(() {
+        _isListening = false;
+      });
+      await _speech.stop();
+    }
+  }
 
 
 
@@ -79,15 +189,6 @@ Future<void> fetchData() async {
     print('Error fetching data: $e');
   }
 }
-
-
-
-  @override
-   void initState(){
-    super.initState();
-    fetchData();
-   }
-
 
 
   @override
@@ -223,21 +324,17 @@ Future<void> fetchData() async {
 
                     SizedBox(height:20),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        ElevatedButton(style: 
-                          ElevatedButton.styleFrom(
-                            backgroundColor:menu,
-                            shape: RoundedRectangleBorder() ),
-                          onPressed:(){if (Paragraph != null) {speakText(Paragraph!);}} ,
-                          child:Text("Start AI",style:TextStyle(color:Colors.white),)
-                        ),
-                        SizedBox(width:20),
-
-                      ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor:menu,shape: RoundedRectangleBorder() ),onPressed:(){stopSpeaking();} , child:Text("Stop AI",style:TextStyle(color:Colors.white),)),
-                        
-                        ]),
+                   Row(
+                    children: [
+                      ElevatedButton(onPressed:(){if (Paragraph != null) {speakText(Paragraph!);}}, child:Icon(Icons.speaker)),
+                      SizedBox(width:15),
+                      ElevatedButton(onPressed: (){stopSpeaking();}, child:Icon(Icons.speaker_notes_off)),
+                      SizedBox(width:15),
+                      ElevatedButton(onPressed: (){_startListening();}, child:Icon(Icons.mic)),
+                      SizedBox(width:15),
+                      ElevatedButton(onPressed: (){_stopListening();}, child:const Icon(Icons.stop)),
+                    ],
+                  ),
                           
                           //ARTICLE CONTENT
 
@@ -248,27 +345,27 @@ Future<void> fetchData() async {
                               child:((){
                               if (selected_index==1){
                                 Paragraph=article_content[article_name_in].level1;
-                                print(Paragraph);
+                            
                                 return  textwidget(article_content[article_name_in].level1,textsize, FontWeight.w200, Colors.black,);
                                 }
                               else if (selected_index==2){
                                 Paragraph=article_content[article_name_in].level2;
-                                print(Paragraph);
+                                
                                 return textwidget(article_content[article_name_in].level2,textsize, FontWeight.w200, Colors.black,);
                               }
                               else if (selected_index==3){
                                 Paragraph=article_content[article_name_in].level3;
-                                print(Paragraph);
+                                
                                 return textwidget(article_content[article_name_in].level3,textsize, FontWeight.w200, Colors.black,);
                               }
                               else if (selected_index==4){
                                 Paragraph=article_content[article_name_in].level4;
-                                print(Paragraph);
+                               
                                 return textwidget(article_content[article_name_in].level4,textsize, FontWeight.w200, Colors.black,);
                              }
                              else{
                               Paragraph=article_content[article_name_in].level5;
-                              print(Paragraph);
+                              
                               return textwidget(article_content[article_name_in].level5,textsize, FontWeight.w200, Colors.black,);
                              }
                              
@@ -294,5 +391,12 @@ Future<void> fetchData() async {
         ],)
       );
     
+  }
+  @override
+  void dispose() {
+    _speech.stop();
+    super.dispose();
+    _uiChangeStreamController.close(); // Close the stream when the widget is disposed
+    super.dispose();
   }
 }

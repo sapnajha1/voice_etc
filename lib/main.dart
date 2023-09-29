@@ -1,3 +1,4 @@
+
 import 'package:englishetc_voice_ai/splash.dart';
 import 'package:englishetc_voice_ai/voice_re.dart';
 import 'package:flutter/material.dart';
@@ -28,8 +29,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      home:MyHomePage()
-      // home:splashScreen()
+      // home:ErrorPronunciation()
+      home:splashScreen()
       // home: Responsive_layout(
       //           mobileScaffold: MobilePage(title: 'mobilepage',userdata:googleSignInAccount),
       //           tabletScaffold: tabletPage(title: 'tabletpage',userdata:googleSignInAccount),

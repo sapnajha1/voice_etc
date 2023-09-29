@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:englishetc_voice_ai/api_function/api.dart';
+import 'package:englishetc_voice_ai/api_function/model.dart';
 import 'package:englishetc_voice_ai/const/color.dart';
 import 'package:englishetc_voice_ai/constWidget/textwidget.dart';
 import 'package:englishetc_voice_ai/mainscreens/aap_bar.dart';

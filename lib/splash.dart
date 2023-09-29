@@ -28,11 +28,11 @@ class _splashScreenState extends State<splashScreen> {
    void initState(){
     super.initState();
      Future.delayed(Duration(seconds: 3),(){Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>
-            // SignUp()
-            Responsive_layout(
-                mobileScaffold: MobilePage(title: 'mobilepage',userdata:googleSignInAccount),
-                tabletScaffold: tabletPage(title: 'tabletpage',userdata:googleSignInAccount),
-                desktopScaffold: DesktopPage(title: 'desktoppage',userdata:googleSignInAccount))
+            SignUp()
+            // Responsive_layout(
+            //     mobileScaffold: MobilePage(title: 'mobilepage',userdata:googleSignInAccount),
+            //     tabletScaffold: tabletPage(title: 'tabletpage',userdata:googleSignInAccount),
+            //     desktopScaffold: DesktopPage(title: 'desktoppage',userdata:googleSignInAccount))
             ));});
     // whereToGo();
    }
