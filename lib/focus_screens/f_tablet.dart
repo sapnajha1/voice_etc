@@ -44,7 +44,7 @@ class _f_tabletPageState extends State<f_tabletPage> {
                   Row(
                     // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Article_image(height:mq.height*0.15,width:mq.width*0.20,),
+                      Article_image(height:mq.height*0.15,width:mq.width*0.20, imgurl: '',),
                       const SizedBox(width:25),
                       Flexible(child: textwidget(widget.article_content[widget.article_name_in].title,25, FontWeight.bold, textcolor)),
                       //  const SizedBox(width:30)

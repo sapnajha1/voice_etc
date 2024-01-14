@@ -168,7 +168,7 @@ Future<void> _stopListening() async {
 List<Article_Model> article_content=[];
 Future<void> fetchData() async {
   try {
-    final response = await http.get(Uri.parse('https://merd-api.merakilearn.org/englishAi/content'));
+    final response = await http.get(Uri.parse('https://merd-api.merakilearn.org/englishAi/content/today'));
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body)['articles'] as List<dynamic>;
@@ -218,7 +218,7 @@ Future<void> fetchData() async {
           appbaricon: Icons.person,
           appbarsize: 16,image_height: 20,image_width: 30,textfont: 18,popupmenu:15, cleanedWord: null, notAvailable: '', score: null,
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         //BODY
         body:
         Column(children:[
@@ -234,7 +234,7 @@ Future<void> fetchData() async {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               // ARTICLE IMAGE
-                              Article_image(height:mq.height*0.05,width:mq.width*0.220, ),
+                              Article_image(height:mq.height*0.05,width:mq.width*0.220, imgurl: '', ),
                              
                               // ARTICLE NAME
                               //  Wrap(children:[ Container(width:150,height:50,color:Colors.red,child: textwidget(article_content[article_name_in].title,20, FontWeight.bold, Colors.black))]),

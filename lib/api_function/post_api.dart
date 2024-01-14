@@ -6,7 +6,9 @@ import 'package:http/http.dart' as http;
 Map<String,dynamic> userPostData={};
 Future<dynamic> postData(userPostData) async {
   // Define the API endpoint URL
-  String apiUrl = 'https://merd-api.merakilearn.org/englishAi/history?english_ai_id=3';
+  String apiUrl =
+  'https://merd-api.merakilearn.org/englishAi/content/today';
+      // 'https://merd-api.merakilearn.org/englishAi/history?english_ai_id=3';
 
   // Prepare the data to send
   

@@ -55,7 +55,7 @@ class _f_DesktopPageState extends State<f_DesktopPage> {
                       children: [
 
                         // Article image
-                        Article_image(height:mq.height*0.15,width:mq.width*0.15,),
+                        Article_image(height:mq.height*0.15,width:mq.width*0.15, imgurl: 'images/games.jpeg',),
 
                         // Article name
                         const SizedBox(width:0),
@@ -64,7 +64,7 @@ class _f_DesktopPageState extends State<f_DesktopPage> {
                         // Article in Focus mode
                         const SizedBox(width:0),
                         InkWell(onTap:(){Navigator.pop(context);},
-                        child:Focas_container(focustext:"Exit from focus Mode", fontsize:300,
+                        child:Focas_container(focustext:"Exit from focus Mode", fontsize:20,
                         // height:mq.height* 0.100,
                         // width:mq.width* 0.21,fontsize:17,
                         ))                      ],),

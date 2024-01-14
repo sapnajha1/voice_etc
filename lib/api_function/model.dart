@@ -11,18 +11,26 @@ class Article_Model{
   late String level3;
   late String level4;
   late String level5;
-  
+
 
   Article_Model({r,required this.title,required this.level1,required this.level2,required this.level3, required this.level4, required this.level5});
 
   factory Article_Model.fromJson(Map<dynamic,dynamic> json){
     return Article_Model(
-      title:  json['title'] as String ,
-      level1: json['level1'] as String , 
-      level2: json['level2'] as String , 
-      level3: json['level3'] as String , 
-      level4: json['level4'] as String , 
-      level5: json['level5'] as String ,
+
+      title: json['title'] as String,
+      level1: json['levelWise']['level_1']['content'] as String,
+      level2: json['levelWise']['level_2']['content'] as String,
+      level3: json['levelWise']['level_3']['content'] as String,
+      level4: json['levelWise']['level_4']['content'] as String,
+      level5: json['levelWise']['level_5']['content'] as String,
+
+      // title:  json['title'] as String ,
+      // level1: json['level1'] as String ,
+      // level2: json['level2'] as String ,
+      // level3: json['level3'] as String ,
+      // level4: json['level4'] as String ,
+      // level5: json['level5'] as String ,
     //   factory Article_Model.fromJson(Map<String, dynamic> json) {
   // Map<String, dynamic>? idMap = json['id'] as Map<String, dynamic>?;
 
@@ -37,8 +45,8 @@ class Article_Model{
     // id: idMap != null ? Map<String, int>.from(idMap) : <String, int>{},
   );
 }
-      
-  
+
+
 }
 
 class UserData {
@@ -77,4 +85,4 @@ class UserData {
 
 
 
- 
+

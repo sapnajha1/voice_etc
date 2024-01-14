@@ -15,7 +15,10 @@ class Focas_container extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: focusmode, borderRadius: BorderRadius.circular(15)),
+      decoration: BoxDecoration(color:
+      focusmode,
+      // Theme.of(context).colorScheme.primary,
+          borderRadius: BorderRadius.circular(15)),
       padding: const EdgeInsets.all(10.0),
       child: Row(
         mainAxisSize: MainAxisSize.min, // Adjust this line
