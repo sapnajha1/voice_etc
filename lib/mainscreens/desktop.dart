@@ -435,124 +435,119 @@ Future<void> fetchData() async {
                     //                       //   color: focusmode,
                     //                       //   borderRadius: BorderRadius.circular(15),
                     //                       // ),
-                    Align(alignment: Alignment.centerLeft,
-                      child: Container(width: 100,
-                        decoration: BoxDecoration(color: focusmode,borderRadius: BorderRadius.circular(50),border: Border.all(width: 3,color: highlights),
-                        ),
-                        child: Align(alignment: Alignment.centerLeft,
-                          child: Row(
-                            children: [
-                              InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      if (Paragraph != null) {
-                                        if (isSpeaking && !isStopping) {
-                                          isStopping = true;
-                                          isSpeaking = false;
-                                          stopSpeaking().then((success) {
-                                            isStopping = false;
-                                          });
-                                        } else {
-                                          isSpeaking = true;
-                                          isStopping = false;
-                                          speakText(Paragraph!).then((success) {
-                                            if (!success) {
-                                              isSpeaking = false;
+                    Row(
+                      children: [
+                        Align(alignment: Alignment.centerLeft,
+                          child: Container(width: 100,
+                            decoration: BoxDecoration(color: focusmode,borderRadius: BorderRadius.circular(50),border: Border.all(width: 3,color: highlights),
+                            ),
+                            child: Align(alignment: Alignment.centerLeft,
+                              child: Row(
+                                children: [
+                                  InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          if (Paragraph != null) {
+                                            if (isSpeaking && !isStopping) {
                                               isStopping = true;
+                                              isSpeaking = false;
+                                              stopSpeaking().then((success) {
+                                                isStopping = false;
+                                              });
+                                            } else {
+                                              isSpeaking = true;
+                                              isStopping = false;
+                                              speakText(Paragraph!).then((success) {
+                                                if (!success) {
+                                                  isSpeaking = false;
+                                                  isStopping = true;
+                                                }
+                                              });
                                             }
-                                          });
-                                        }
-                                      }
-                                    });
-                                  },
-                                  child: Image.asset(
-                                    isSpeaking
-                                        ? (isStopping ? "images/horn.png" : "images/no horn.png")
-                                        : "images/no horn.png",
-                                    height: 20,
-                                    width: 20,
+                                          }
+                                        });
+                                      },
+                                      child: Image.asset(
+                                        isSpeaking
+                                            ? (isStopping ? "images/horn.png" : "images/horn.png")
+                                            : "images/no horn.png",
+                                        height: 20,
+                                        width: 20,
+                                      ),
+                                    ),
+
+
+                              SizedBox(width: 8,),
+                              InkWell(
+                                onTap: () {
+                                },
+                                child: Text(
+                                  'Listen',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
                                   ),
                                 ),
-
-
-                          SizedBox(width: 8,),
-                          InkWell(
-                            onTap: () {
-                            },
-                            child: Text(
-                              'Listen',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
+                              ),
+                                ],
                               ),
                             ),
-                          ),
-                            ],
+
                           ),
                         ),
 
-                      ),
+
+                          SizedBox(width: 70,),
+
+                          ElevatedButton(onPressed: (){_startListening();
+                          userVoiceData =_text;
+                          // heyspeak.add(userVoiceData);
+
+                           print("this is the user voice $userVoiceData yes");
+                          }, child:textwidget("start", 10, FontWeight.bold, Color.fromARGB(255, 25, 104, 82))),
+                          SizedBox(width:15),
+                          ElevatedButton(onPressed: (){
+                            _stopListening();
+                            int score = 0;// Iterate through heyspeak and perform the checks
+                            final cleanedWord = Paragraph.replaceAll(RegExp(r'[^\w\s]'), '').trim().split(" ");
+                            for (String word in heyspeak) {
+                              if (Paragraph.contains(word)) {
+                                Available.add(word);
+                                score++; // Increment the score if the word is found in the paragraph
+                              } else {
+                                notAvailable.add(word); // Add the word to notAvailable if it's not found
+                              }
+                            }// Print the results
+                            print("Words not available in paragraph: $notAvailable");
+                            // print("Words available in paragraph: $Available");
+                            int ParagraphLength= cleanedWord.length;
+                            print("Your Score: $score/ $ParagraphLength");
+                            // print(Paragraph.length);
+                            showAlertDialog(context,score, notAvailable,ParagraphLength );
+                            },
+
+                            child:textwidget("finish", 10, FontWeight.bold, Color.fromARGB(255, 25, 104, 82))
+                            ),
+                      ],
                     ),
 
 
 
-                    //   Row(
-                  //   children: [
-                  //     ElevatedButton(onPressed:(){if (Paragraph != null) {speakText(Paragraph!);}}, child:Icon(Icons.speaker)),
-                  //     SizedBox(width:15),
-                  //     ElevatedButton(onPressed: (){stopSpeaking();}, child:Icon(Icons.speaker_notes_off)),
-                  //     SizedBox(width:15),
-                  //     ElevatedButton(onPressed: (){_startListening();}, child:Icon(Icons.mic)),
-                  //     SizedBox(width:15),
-                  //     ElevatedButton(onPressed: (){_stopListening();}, child:Icon(Icons.stop)),
-                  //     SizedBox(width:15),
-                  //     ElevatedButton(onPressed: (){_startListening();
-                  //     userVoiceData =_text;
-                  //     // heyspeak.add(userVoiceData);
-                  //
-                  //      print("this is the user voice $userVoiceData yes");
-                  //     }, child:textwidget("start", 10, FontWeight.bold, Color.fromARGB(255, 25, 104, 82))),
-                  //     SizedBox(width:15),
-                  //     ElevatedButton(onPressed: (){
-                  //       _stopListening();
-                  //       int score = 0;// Iterate through heyspeak and perform the checks
-                  //       final cleanedWord = Paragraph.replaceAll(RegExp(r'[^\w\s]'), '').trim().split(" ");
-                  //       for (String word in heyspeak) {
-                  //         if (Paragraph.contains(word)) {
-                  //           Available.add(word);
-                  //           score++; // Increment the score if the word is found in the paragraph
-                  //         } else {
-                  //           notAvailable.add(word); // Add the word to notAvailable if it's not found
-                  //         }
-                  //       }// Print the results
-                  //       print("Words not available in paragraph: $notAvailable");
-                  //       // print("Words available in paragraph: $Available");
-                  //       int ParagraphLength= cleanedWord.length;
-                  //       print("Your Score: $score/ $ParagraphLength");
-                  //       // print(Paragraph.length);
-                  //       showAlertDialog(context,score, notAvailable,ParagraphLength );
-                  //       },
-                  //
-                  //       child:textwidget("finish", 10, FontWeight.bold, Color.fromARGB(255, 25, 104, 82))
-                  //       ),
-                  //
+                                          SizedBox(height:30),
+                                          // Article content
 
-
-                    SizedBox(height:30),
-                    // Article content
-
-                    // Wrap the part that displays the article content with StreamBuilder
-                      // StreamBuilder(
-                      //   stream: _uiChangeStreamController.stream,
-                      //   builder: (context, snapshot) {
-                      //     // Check if an event is received
-                      //     if (snapshot.hasData) {
-                      //       // Stop the AI when an event is received
-                      //       stopSpeaking();
-                      //     }
-
-                          // Return the UI for displaying the article content
-                          // return
+                                          // Wrap the part that displays the article content with StreamBuilder
+                                          //   StreamBuilder(
+                                          //     stream: _uiChangeStreamController.stream,
+                                          //     builder: (context, snapshot) {
+                                          //       // Check if an event is received
+                                          //       if (snapshot.hasData) {
+                                          //         // Stop the AI when an event is received
+                                          //         stopSpeaking();
+                                          //       }
+                                          //
+                                          //       // Return the UI for displaying the article content
+                                          //       return
                           Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: Container(
@@ -596,16 +591,7 @@ Future<void> fetchData() async {
                               })(),
                             ),
                           ),
-                      //   },
-                      // ),
 
-
-
-                  ],
-                ),
-              ),
-            ),
-          ),
 
 
       Container(height: 60,width:mq.width
@@ -625,13 +611,17 @@ Future<void> fetchData() async {
                 },child: Image.asset( _isListening ? 'images/offmicrophone.png' : 'images/microphone.png',
                   height: 40,
                   width: 40,),),
-                InkWell(onTap: (){setState((){if(article_name_in<article_content.length-1){article_name_in++;}});},child: Image.asset("images/right-arrow-black-triangle.png",height:35,width:35)),
+                InkWell(onTap: (){setState((){
+                  if(article_name_in<article_content.length-1){
+                    article_name_in++;
+                  }});},
+                    child: Image.asset("images/right-arrow-black-triangle.png",height:35,width:35)),
                 // InkWell(onTap:(){Navigator.push(context, MaterialPageRoute(builder: (context)=>article_names(article_content: article_content)));},child:Text("Content",style: TextStyle(fontSize:20,fontWeight: FontWeight.bold),))
               ])),
     ])
       // bottomNavigationBar: bottomScreen(),
 
-    );
+    ))) ]));
   }
   
  

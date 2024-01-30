@@ -36,18 +36,20 @@ class appbar extends StatelessWidget implements PreferredSizeWidget {
   int? cleanedWord;
 
 
-  appbar({required this.cleanedWord,required this.notAvailable,required this.score,required this.Paragraph,required this.appbaricon,required this.userData, required this.appbarsize ,required this.popupmenu,required this.image_width,required this.image_height,required this.textfont, });
+  appbar({required this.cleanedWord,required this.notAvailable,required this.score,required this.Paragraph,
+    required this.appbaricon,required this.userData, required this.appbarsize ,required this.popupmenu,
+    required this.image_width,required this.image_height,required this.textfont, });
   
   // FlutterTts flutterTts = FlutterTts();
   // Future<void> speakText(String Paragraph) async {
   //   final ttsExample = TtsExample(); // Create an instance of the TtsExample class
   //   await ttsExample.speakText(Paragraph); // Call the speakText function
   // }
-
+  //
   // Future<void> stopSpeaking() async {
   //   await flutterTts.stop(); // Stop TTS
   // }
-
+  //
   // String valueChoose;
   @override
   Widget build(BuildContext context) {
@@ -97,7 +99,7 @@ class appbar extends StatelessWidget implements PreferredSizeWidget {
               //       } else {
               //         print('Paragraph is null');
               //       }
-
+              //
               //     }},
               //     child: Icon(
               //     isSpeaking ? Icons.mic_off : Icons.mic,
@@ -141,10 +143,10 @@ class appbar extends StatelessWidget implements PreferredSizeWidget {
                                     else if (value == 'progress') {
                                       showAboutDialog(context: context,);
                                      } 
-                                    //else if (value == 'edit') {
-                                    //     _scaffoldKey.currentState?.openDrawer();
+                                    else if (value == 'edit') {
+                                        _scaffoldKey.currentState?.openDrawer();
 
-                                    // }
+                                    }
                                      else if (value == 'Sign Out') {
 
                                       final _googleSignIn = GoogleSignIn(clientId:
